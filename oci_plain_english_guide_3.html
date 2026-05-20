@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OCI — Plain English Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F8F7F4;
+  --surface: #FFFFFF;
+  --border: rgba(0,0,0,0.09);
+  --text: #1A1A1A;
+  --muted: #6B6B6B;
+  --faint: #ADADAD;
+  --purple-bg: #EEEDFE; --purple-mid: #534AB7; --purple-dark: #3C3489;
+  --teal-bg: #E1F5EE; --teal-mid: #0F6E56; --teal-dark: #04342C;
+  --coral-bg: #FAECE7; --coral-mid: #993C1D; --coral-dark: #4A1B0C;
+  --blue-bg: #E6F1FB; --blue-mid: #185FA5; --blue-dark: #042C53;
+  --green-bg: #EAF3DE; --green-mid: #3B6D11; --green-dark: #173404;
+  --pink-bg: #FBEAF0; --pink-mid: #993556; --pink-dark: #4B1528;
+  --amber-bg: #FAEEDA; --amber-mid: #854F0B; --amber-dark: #412402;
+  --gray-bg: #F1EFE8; --gray-mid: #5F5E5A; --gray-dark: #2C2C2A;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+.hero { padding: 3rem 2rem 2rem; max-width: 820px; margin: 0 auto; }
+.hero-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--purple-mid); margin-bottom: 12px; }
+.hero h1 { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 700; line-height: 1.1; margin-bottom: 10px; }
+.hero p { font-size: 15px; color: var(--muted); max-width: 520px; }
+.controls { padding: 0 2rem 1.5rem; max-width: 820px; margin: 0 auto; display: flex; gap: 10px; flex-wrap: wrap; }
+.controls input { flex: 1; min-width: 200px; padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); outline: none; }
+.controls input:focus { border-color: var(--purple-mid); }
+.controls select { padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); cursor: pointer; outline: none; }
+.xbtn { padding: 9px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--muted); cursor: pointer; }
+.xbtn:hover { background: var(--bg); }
+.main { max-width: 820px; margin: 0 auto; padding: 0 2rem 4rem; }
+.domain-block { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 12px; background: var(--surface); }
+.domain-hdr { display: flex; align-items: center; gap: 12px; padding: 15px 18px; cursor: pointer; user-select: none; }
+.domain-hdr:hover { filter: brightness(0.97); }
+.d-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.d-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; flex: 1; }
+.d-tagline { font-size: 12px; color: var(--muted); font-style: italic; }
+.d-arrow { font-size: 18px; color: var(--faint); transition: transform .25s; margin-left: 4px; }
+.d-arrow.open { transform: rotate(180deg); }
+.domain-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--border); }
+.domain-body.open { display: block; }
+.topic-block { border: 1px solid var(--border); border-radius: 10px; margin-top: 10px; overflow: hidden; }
+.topic-hdr { display: flex; align-items: center; gap: 8px; padding: 11px 14px; cursor: pointer; background: var(--surface); }
+.topic-hdr:hover { background: var(--bg); }
+.t-title { font-size: 13px; font-weight: 500; flex: 1; }
+.t-arrow { font-size: 15px; color: var(--faint); transition: transform .2s; }
+.t-arrow.open { transform: rotate(180deg); }
+.topic-body { display: none; border-top: 1px solid var(--border); }
+.topic-body.open { display: block; }
+.strip-analogy { padding: 13px 15px; }
+.strip-example { padding: 13px 15px; }
+.strip-remember { padding: 11px 15px; border-top: 1px solid var(--border); }
+.strip-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 5px; }
+.strip-text { font-size: 13px; line-height: 1.7; }
+.no-result { text-align: center; color: var(--muted); padding: 3rem; font-size: 14px; }
+
+/* Domain colors */
+.d1 .domain-hdr { background: var(--purple-bg); }
+.d1 .d-num { background: var(--purple-mid); color: #fff; }
+.d1 .d-title { color: var(--purple-dark); }
+.d1 .strip-analogy { background: #F5F4FE; }
+.d1 .strip-analogy .strip-label { color: var(--purple-mid); }
+.d1 .strip-analogy .strip-text { color: var(--purple-dark); }
+.d1 .strip-example { background: #FAFAFE; }
+.d1 .strip-remember { background: var(--green-bg); }
+.d1 .strip-remember .strip-label { color: var(--green-mid); }
+.d1 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d2 .domain-hdr { background: var(--blue-bg); }
+.d2 .d-num { background: var(--blue-mid); color: #fff; }
+.d2 .d-title { color: var(--blue-dark); }
+.d2 .strip-analogy { background: #F0F6FD; }
+.d2 .strip-analogy .strip-label { color: var(--blue-mid); }
+.d2 .strip-analogy .strip-text { color: var(--blue-dark); }
+.d2 .strip-example { background: #F8FBFE; }
+.d2 .strip-remember { background: var(--green-bg); }
+.d2 .strip-remember .strip-label { color: var(--green-mid); }
+.d2 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d3 .domain-hdr { background: var(--teal-bg); }
+.d3 .d-num { background: var(--teal-mid); color: #fff; }
+.d3 .d-title { color: var(--teal-dark); }
+.d3 .strip-analogy { background: #EDF8F4; }
+.d3 .strip-analogy .strip-label { color: var(--teal-mid); }
+.d3 .strip-analogy .strip-text { color: var(--teal-dark); }
+.d3 .strip-example { background: #F5FBFA; }
+.d3 .strip-remember { background: var(--green-bg); }
+.d3 .strip-remember .strip-label { color: var(--green-mid); }
+.d3 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d4 .domain-hdr { background: var(--coral-bg); }
+.d4 .d-num { background: var(--coral-mid); color: #fff; }
+.d4 .d-title { color: var(--coral-dark); }
+.d4 .strip-analogy { background: #FDF5F2; }
+.d4 .strip-analogy .strip-label { color: var(--coral-mid); }
+.d4 .strip-analogy .strip-text { color: var(--coral-dark); }
+.d4 .strip-example { background: #FEFAF9; }
+.d4 .strip-remember { background: var(--green-bg); }
+.d4 .strip-remember .strip-label { color: var(--green-mid); }
+.d4 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d5 .domain-hdr { background: var(--green-bg); }
+.d5 .d-num { background: var(--green-mid); color: #fff; }
+.d5 .d-title { color: var(--green-dark); }
+.d5 .strip-analogy { background: #F3F9EC; }
+.d5 .strip-analogy .strip-label { color: var(--green-mid); }
+.d5 .strip-analogy .strip-text { color: var(--green-dark); }
+.d5 .strip-example { background: #F8FCF4; }
+.d5 .strip-remember { background: var(--purple-bg); }
+.d5 .strip-remember .strip-label { color: var(--purple-mid); }
+.d5 .strip-remember .strip-text { color: var(--purple-dark); }
+
+.d6 .domain-hdr { background: var(--pink-bg); }
+.d6 .d-num { background: var(--pink-mid); color: #fff; }
+.d6 .d-title { color: var(--pink-dark); }
+.d6 .strip-analogy { background: #FDF2F6; }
+.d6 .strip-analogy .strip-label { color: var(--pink-mid); }
+.d6 .strip-analogy .strip-text { color: var(--pink-dark); }
+.d6 .strip-example { background: #FEF8FA; }
+.d6 .strip-remember { background: var(--green-bg); }
+.d6 .strip-remember .strip-label { color: var(--green-mid); }
+.d6 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d7 .domain-hdr { background: var(--amber-bg); }
+.d7 .d-num { background: var(--amber-mid); color: #fff; }
+.d7 .d-title { color: var(--amber-dark); }
+.d7 .strip-analogy { background: #FDF6EA; }
+.d7 .strip-analogy .strip-label { color: var(--amber-mid); }
+.d7 .strip-analogy .strip-text { color: var(--amber-dark); }
+.d7 .strip-example { background: #FEFBF5; }
+.d7 .strip-remember { background: var(--green-bg); }
+.d7 .strip-remember .strip-label { color: var(--green-mid); }
+.d7 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d8 .domain-hdr { background: #E8F4FE; }
+.d8 .d-num { background: #1565C0; color: #fff; }
+.d8 .d-title { color: #0D3B7A; }
+.d8 .strip-analogy { background: #F2F8FE; }
+.d8 .strip-analogy .strip-label { color: #1565C0; }
+.d8 .strip-analogy .strip-text { color: #0D3B7A; }
+.d8 .strip-example { background: #F8FBFE; }
+.d8 .strip-remember { background: var(--green-bg); }
+.d8 .strip-remember .strip-label { color: var(--green-mid); }
+.d8 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d9 .domain-hdr { background: var(--gray-bg); }
+.d9 .d-num { background: var(--gray-mid); color: #fff; }
+.d9 .d-title { color: var(--gray-dark); }
+.d9 .strip-analogy { background: #F5F4F2; }
+.d9 .strip-analogy .strip-label { color: var(--gray-mid); }
+.d9 .strip-analogy .strip-text { color: var(--gray-dark); }
+.d9 .strip-example { background: #FAFAF9; }
+.d9 .strip-remember { background: var(--green-bg); }
+.d9 .strip-remember .strip-label { color: var(--green-mid); }
+.d9 .strip-remember .strip-text { color: var(--green-dark); }
+
+.d10 .domain-hdr { background: #E4F5EF; }
+.d10 .d-num { background: #0B5E41; color: #fff; }
+.d10 .d-title { color: #03301F; }
+.d10 .strip-analogy { background: #EFF9F5; }
+.d10 .strip-analogy .strip-label { color: #0B5E41; }
+.d10 .strip-analogy .strip-text { color: #03301F; }
+.d10 .strip-example { background: #F6FCFA; }
+.d10 .strip-remember { background: var(--purple-bg); }
+.d10 .strip-remember .strip-label { color: var(--purple-mid); }
+.d10 .strip-remember .strip-text { color: var(--purple-dark); }
+
+.d11 .domain-hdr { background: var(--purple-bg); }
+.d11 .d-num { background: var(--purple-dark); color: #fff; }
+.d11 .d-title { color: #1A1060; }
+.d11 .strip-analogy { background: #F5F4FE; }
+.d11 .strip-analogy .strip-label { color: var(--purple-dark); }
+.d11 .strip-analogy .strip-text { color: #1A1060; }
+.d11 .strip-example { background: #FAFAFE; }
+.d11 .strip-remember { background: var(--teal-bg); }
+.d11 .strip-remember .strip-label { color: var(--teal-mid); }
+.d11 .strip-remember .strip-text { color: var(--teal-dark); }
+
+.d12 .domain-hdr { background: var(--amber-bg); }
+.d12 .d-num { background: #7A4200; color: #fff; }
+.d12 .d-title { color: var(--amber-dark); }
+.d12 .strip-analogy { background: #FDF5E8; }
+.d12 .strip-analogy .strip-label { color: #7A4200; }
+.d12 .strip-analogy .strip-text { color: var(--amber-dark); }
+.d12 .strip-example { background: #FEFBF4; }
+.d12 .strip-remember { background: var(--green-bg); }
+.d12 .strip-remember .strip-label { color: var(--green-mid); }
+.d12 .strip-remember .strip-text { color: var(--green-dark); }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">OCI Full Prep &mdash; Plain English Edition</div>
+  <h1>Cloud concepts,<br>no jargon.</h1>
+  <p>Every OCI topic explained using everyday analogies, real examples, and one thing to remember. All 12 domains.</p>
+</div>
+
+<div class="controls">
+  <input type="text" id="srch" placeholder="&#128269; Search any concept in plain words..." oninput="go()">
+  <select id="df" onchange="go()">
+    <option value="">All 12 domains</option>
+    <option value="d1">D1 — Fundamentals</option>
+    <option value="d2">D2 — IAM</option>
+    <option value="d3">D3 — Networking</option>
+    <option value="d4">D4 — Compute</option>
+    <option value="d5">D5 — Storage</option>
+    <option value="d6">D6 — Database</option>
+    <option value="d7">D7 — Security</option>
+    <option value="d8">D8 — Containers</option>
+    <option value="d9">D9 — Observability</option>
+    <option value="d10">D10 — DevOps</option>
+    <option value="d11">D11 — AI & Data</option>
+    <option value="d12">D12 — Pricing</option>
+  </select>
+  <button class="xbtn" onclick="xa(true)">expand all</button>
+  <button class="xbtn" onclick="xa(false)">collapse all</button>
+</div>
+
+<div class="main" id="main"></div>
+
+<script>
+const DATA = [
+{k:"d1",num:"D1",name:"Fundamentals & architecture",tagline:"The city that never stops running",topics:[
+{n:"Regions & availability domains",a:"OCI is like a country with many cities (regions). Each city — say Mumbai or Hyderabad — has independent neighbourhoods called Availability Domains. Even if one neighbourhood has a power cut, the others keep running completely fine.",e:"Your app lives in Mumbai city. Pick the city closest to your customers for fast responses. Big cities like US have 3 neighbourhoods — if one goes down, the other two keep everything running.",r:"Region = city. Availability Domain = independent neighbourhood within that city. More neighbourhoods = more safety."},
+{n:"Fault domains",a:"Each neighbourhood has 3 separate apartment blocks called Fault Domains. A broken water pump in block 1 doesn't affect blocks 2 and 3. OCI spreads your servers across blocks automatically.",e:"You have 3 web servers. OCI puts one in each block. Block 1's broken hardware only takes down server 1, not all 3. Your app keeps running.",r:"Always spread important servers across all 3 Fault Domains. Think of them as 3 separate, independent apartment blocks."},
+{n:"OCI console, CLI, SDK, API",a:"Four ways to talk to OCI. Console = click on a website (point and click). CLI = type text commands in a terminal. SDK = your app talks to OCI automatically in code. API = the underlying phone line everything uses.",e:"Like booking a flight: travel website (Console), phone call to airline (CLI), travel app doing it for you (SDK). All reach the same airline system underneath (API).",r:"Console for humans exploring. SDK and API for machines automating. Cloud Shell = browser terminal with CLI pre-installed, zero setup needed."},
+{n:"Tenancy & compartments",a:"Your OCI account is like a huge office building called Tenancy. Inside, you create separate floors (Compartments) for each team — HR on floor 2, Engineering on floor 5. Each floor has its own access rules and budget tracking.",e:"HR team can't accidentally wander into Engineering's server room. Each floor's costs are tracked separately. Managers control only their own floor.",r:"Compartment = a separate, isolated room. Always organise by team or project. Never dump everything in the lobby (root compartment)."},
+{n:"SLA & shared responsibility",a:"Oracle promises the building is safe and electricity keeps working (their job). You are responsible for your own office — locking your door, keeping documents safe, and choosing who gets keys.",e:"If Oracle's power grid fails, that's Oracle's problem. If you leave your office door open and someone walks in and steals data, that's your problem.",r:"Oracle secures the cloud building. You secure what is inside your office. This split is called the shared responsibility model."}
+]},
+{k:"d2",num:"D2",name:"IAM — Identity & Access Management",tagline:"The office security desk",topics:[
+{n:"Users, groups, dynamic groups",a:"Users are individual people with ID badges. Groups are departments — Finance Team, Developers, Admins. Dynamic Groups are machine ID cards given to servers so they can do things automatically without needing a human's badge.",e:"Ravi works in Finance. He is in the Finance Group. His team's backup server has a Dynamic Group pass so it automatically saves reports every night — no human needed.",r:"Never give individuals special access directly. Put people in groups, give groups permissions. Give machines Dynamic Groups instead of passwords."},
+{n:"Policies — inspect, read, use, manage",a:"Policies are rules written in plain English sentences. Four power levels — Inspect (can see the list), Read (can open and read it), Use (can work with it), Manage (full power — create, change, delete everything).",e:"Intern can Inspect (see that servers exist). Developer can Read (look inside). Senior engineer can Use (start and stop servers). Admin can Manage (create and delete). Think: intern → employee → senior → boss.",r:"Inspect < Read < Use < Manage. Each level includes all levels below it. Always grant the least power needed for the job."},
+{n:"Compartment hierarchy",a:"Give someone access to a parent compartment and they automatically get access to everything inside it — all child compartments. Access flows downward like water. You don't need to set it again for each child.",e:"Give the Production Manager access to the 'Production' compartment. They automatically get access to WebTier, DBTier, and NetworkTier compartments inside it. One rule, full coverage.",r:"Access cascades down automatically. Be careful what you grant at parent level — it covers everything below."},
+{n:"Federation (SSO)",a:"Use your existing company ID card to enter OCI — no separate OCI password needed. Your company's login system talks to OCI and confirms you are allowed in.",e:"Like using your office keycard to enter a partner building. No new card to create. The two organisations have an agreement to trust each other's cards.",r:"Federation = Single Sign-On. Employees use existing company login. No separate OCI passwords to forget, reset, or manage separately."},
+{n:"Resource principals",a:"Instead of giving a server a username and password (which could be stolen), Oracle gives it a built-in digital ID certificate. The server automatically shows this certificate when it needs to talk to other OCI services.",e:"Your backup server doesn't need a stored password to save files to Object Storage. It has a built-in machine ID that says 'I am the authorised backup server — let me through'.",r:"Never store passwords or API keys on servers. Use Resource Principals — the machine's built-in identity. Automatic and far more secure."},
+{n:"MFA & adaptive auth",a:"MFA means after your password you must prove it's really you with a second thing — like a code sent to your phone (OTP). Adaptive auth is smart and only asks for this when something looks suspicious like a new device or unfamiliar location.",e:"Normal login from your usual laptop in Chennai = just your password. Someone tries from an unknown laptop in another country = OCI asks for your phone OTP too.",r:"MFA = password plus phone OTP. Same idea as your bank sending an OTP before a transaction. Adaptive = only asked when something looks suspicious."}
+]},
+{k:"d3",num:"D3",name:"Networking",tagline:"Roads, gates, and highways of your cloud",topics:[
+{n:"VCN and subnets",a:"A VCN is your private gated colony in the cloud. Inside, you divide it into lanes (subnets). Public lanes face the main road — the internet can reach them. Private lanes are inside only — no strangers allowed in.",e:"Your website server sits on the public lane — customers can visit. Your database sits on the private lane — only internal systems can reach it. Front door is public, vault is private.",r:"Public subnet = internet-facing. Private subnet = internal only. Always: web server in public, database in private. Like a shop front is public but the back office is private."},
+{n:"Internet Gateway",a:"The colony's main gate that opens to the public road. Only houses with a visible address sign (public IP) on the public lane can use this gate. No sign, no access.",e:"Your web server has an address visible from the road. Customers ring the bell, walk through the Internet Gateway, and reach your server. Private servers have no visible address so the gate doesn't apply to them.",r:"Internet Gateway = main colony gate. Only works for servers WITH a public IP assigned. Private servers cannot use it — they need NAT or Service Gateway."},
+{n:"NAT Gateway",a:"A delivery-only back gate. Private servers can send packages out (download updates, call external APIs) but nobody from outside can come in through this gate. Strictly one-way exit.",e:"Private database server needs to download a security patch from the internet. Goes out through NAT gate, gets the patch, comes back in. No outsider can ever knock on the NAT gate from outside.",r:"NAT = one-way exit for private servers. Out: yes. In: no. Like a one-way delivery door. Private servers download updates, call APIs — but stay unreachable from outside."},
+{n:"Service Gateway",a:"A private underground tunnel connecting your colony directly to Oracle's own buildings — storage, databases — without touching the public road at all. Faster and costs no internet charges.",e:"Instead of your private server going out to the public road to reach Oracle Object Storage, there is a private tunnel straight from your colony to Oracle's building. Nobody else uses this tunnel.",r:"Service Gateway = private Oracle tunnel. Avoids internet entirely. Saves money on data transfer. For OCI-to-OCI traffic only."},
+{n:"LPG vs DRG",a:"LPG is a private bridge between two colonies in the same city. DRG is a big highway interchange connecting many colonies together and also connecting to your physical office building.",e:"Mumbai Dev colony to Mumbai Prod colony = LPG bridge (same city). All 5 VCN colonies talking to each other plus your physical office = DRG highway hub.",r:"LPG = same city (region), connects 2 VCNs. DRG = cross-region and on-premises hub. LPG is simpler; DRG handles everything at scale."},
+{n:"FastConnect vs VPN",a:"VPN = sending a sealed, encrypted envelope through the regular postal system (public internet). FastConnect = renting your own private dedicated highway lane. More expensive but guaranteed speed and full privacy.",e:"Sending confidential documents. VPN = sealed envelope in regular post (cheaper, variable). FastConnect = your private courier van on a dedicated road (expensive, consistent, private).",r:"VPN = cheaper, uses internet, encrypted. FastConnect = expensive, dedicated lane, guaranteed. Use FastConnect for high traffic or regulated workloads that need consistent performance."},
+{n:"Security Lists vs NSGs",a:"Security List = rules posted at the lane entrance — applies to every house in that lane, no exceptions. NSG = individual house alarm system — each house has its own custom rules.",e:"Security List rule: 'No visitors after 10pm for all houses in this lane.' NSG rule: House A allows deliveries on weekdays, House B allows only family. Different rules per house.",r:"NSG = per-house rules, more precise, preferred. Security List = whole-lane rules. For fine control use NSGs. For broad baseline use Security Lists. Rules from both apply together."},
+{n:"Load Balancer",a:"A traffic cop standing at the colony entrance who directs each customer to whichever server counter is least busy. Splits incoming traffic evenly so no single server gets overwhelmed.",e:"100 customers arrive at your online store. Load Balancer sends 25 to each of 4 servers. One server slows down — Load Balancer stops sending customers there until it recovers.",r:"Load Balancer = traffic cop. One public entry point, many servers behind it. Automatically removes unhealthy servers from rotation without anyone doing anything."},
+{n:"Network Firewall",a:"A highly trained security guard who doesn't just check ID cards but also opens your bags, inspects what you're carrying, and blocks dangerous items — even if your ID is perfectly valid.",e:"Normal security list just checks if your IP address is allowed. Network Firewall also checks if you're carrying malware, blocks access to suspicious websites, inspects encrypted traffic for hidden threats.",r:"Network Firewall = deep inspection guard. Security List = basic ID check. Network Firewall for high-security environments that need advanced threat protection beyond simple rules."}
+]},
+{k:"d4",num:"D4",name:"Compute",tagline:"Your hired workers and their workstations",topics:[
+{n:"VM shapes — Flex, Standard, DenseIO",a:"Shape = the size of workstation you give a server. Flex means you pick exactly how many hands (CPUs) and how much desk space (RAM) you need independently. DenseIO comes with an ultra-fast built-in filing cabinet (local NVMe storage).",e:"Standard = fixed office desk with standard computer. Flex = custom-designed desk, you choose how many monitors, how much RAM. DenseIO = desk with high-speed filing cabinet built right into it.",r:"A1.Flex (ARM) = cheapest. E4.Flex (AMD) = general purpose. DenseIO = when speed of local storage is critical. Flex lets you right-size exactly what you pay for."},
+{n:"Bare Metal",a:"Renting the entire physical building instead of just one room in it. No sharing with anyone, no virtual layer overhead. Every single CPU, GB of RAM, and network port on that server belongs entirely to you.",e:"VM = renting one room in a shared apartment building. Bare Metal = renting the entire building. No neighbours, no shared walls, maximum possible performance.",r:"Bare Metal = whole building. VM = one room. Use Bare Metal for maximum performance: heavy Oracle DB workloads, HPC, strict licensing compliance."},
+{n:"Instance Pools and Autoscaling",a:"Instance Pool = a team of identical servers that can automatically grow or shrink based on how busy things are. When work piles up, new team members appear. When it is quiet, extras go home. You only pay for whoever is actively working.",e:"Food delivery app gets 10x traffic at lunch. Autoscaling adds 15 servers automatically. By 3pm things are quiet — 12 servers clock out. You only paid for the ones that were active.",r:"Autoscaling = team that grows and shrinks with demand automatically. Saves money on quiet days. Handles rush hour without anyone manually doing anything."},
+{n:"Custom images and boot volumes",a:"Custom image = a perfect photograph of a fully configured, ready-to-run workstation. Boot volume = the actual OS hard drive of the server. Take a photo of the perfect setup and use it to create 100 identical copies in minutes.",e:"Spend 2 hours configuring the perfect server — software installed, settings tuned. Take a snapshot. Now create 100 identical servers from that snapshot in 3 minutes each.",r:"Custom image = master template. Boot volume = OS hard drive. The hard drive survives server deletion if you choose — useful for recovery, migration, and re-deployment."},
+{n:"Cloud-init and user-data",a:"A to-do note you slip inside the server as it first powers on. The server reads the note and follows every instruction automatically — installs software, clones code, starts services — without anyone logging in manually.",e:"Your note says: install Nginx, pull the application from GitHub, configure the settings file, start the service, email me when ready. The server does all of this automatically on its very first boot.",r:"Cloud-init = automatic startup instruction note. Eliminates manual post-launch setup entirely. Perfect for repeatable, automated server configuration across many servers."},
+{n:"Preemptible instances",a:"Servers at 50% discount with one catch — Oracle can take them back with just 30 seconds notice if needed elsewhere. Perfect for batch work that can be paused and safely restarted without losing important results.",e:"Running overnight data processing. Preemptible saves 50%. If Oracle reclaims the server at 2am, your job saves its progress and automatically restarts on a new server. Zero data lost.",r:"Preemptible = 50% cheaper but can be reclaimed anytime. Only for fault-tolerant batch jobs. Never for databases, customer-facing services, or anything that cannot safely restart."}
+]},
+{k:"d5",num:"D5",name:"Storage",tagline:"Filing cabinets, warehouses, and vaults",topics:[
+{n:"Block Volume tiers",a:"Block Volumes are external hard drives you plug into your server. Four speed tiers from slow and cheap (like a regular USB drive) to ultra-fast (almost as fast as computer RAM).",e:"Email server = Balanced tier (affordable, good enough). Stock trading database = Ultra High Performance (needs every millisecond). Archive server = Lower Cost (cheapest, rarely accessed).",r:"4 tiers: Lower Cost → Balanced → Higher Performance → Ultra High Performance. More speed costs more. Match the tier to how fast your application actually needs storage."},
+{n:"File Storage FSS — shared network folder",a:"A shared network folder that many servers can all read and write at the same time — like a shared Google Drive folder but for servers. One change is instantly visible to every server connected to it.",e:"20 web servers all need access to the same product catalogue images. One FSS folder mounted by all 20 servers. Update one image in FSS — all 20 servers see the change immediately.",r:"FSS = shared folder for many servers simultaneously. Like a team shared drive. Perfect for shared media, home directories, and content management."},
+{n:"Object Storage — hot, warm, cold",a:"A massive cloud warehouse where you store any files — photos, videos, backups, logs, datasets. Three temperature settings: hot (instant access), warm (slower, cheaper), cold (takes hours to retrieve, very cheap).",e:"Hot: product photos your app serves to customers every day. Warm: last month's invoices you rarely open. Cold: 7-year-old tax records legally required to keep but almost never touched.",r:"Standard hot → Infrequent Access warm (60-day minimum) → Archive cold (90-day minimum, hours to restore). Lifecycle policies move files automatically between temperatures."},
+{n:"Lifecycle policies",a:"Automatic rules that move files between storage temperatures as they age, and delete them once they have expired. Set the rules once and forget about it completely.",e:"Rule: files older than 30 days move to Warm. Older than 1 year move to Cold. Older than 7 years get deleted automatically. Your storage cost goes down steadily over time without any human action.",r:"Lifecycle = automatic file ageing rules. One-time setup. Saves huge money over time. Remember minimum rentals: IA = 60 days, Archive = 90 days even if deleted earlier."},
+{n:"Object Versioning and Retention",a:"Versioning = undo button for files. Every time a file is overwritten or deleted, the previous version is kept safe. Retention locks = nobody can delete files for a set time period — not even the top admin.",e:"Staff accidentally deletes an important contract file. Versioning lets you restore yesterday's version in one click. Retention rule on legal documents means nobody can delete them for 7 years — not even the CEO.",r:"Versioning = file undo button. Retention = mandatory lock nobody can override. Use retention for legal compliance and regulatory requirements."},
+{n:"OCI Cache — in-memory speed",a:"A fast notepad on your desk. Instead of opening the filing cabinet (database) every time someone asks the same question, you write the answer on the notepad and hand it from there instantly.",e:"100 users per second ask for today's exchange rate. Without cache: 100 database queries per second. With cache: 1 query, answer saved on notepad, 99 users get it from the notepad in milliseconds.",r:"Cache = fast in-memory notepad for repeated questions. Redis-compatible. Reduces database load dramatically. Data is temporary — only kept in memory, not permanently stored."}
+]},
+{k:"d6",num:"D6",name:"Database services",tagline:"Organised data rooms with specialist staff",topics:[
+{n:"Autonomous DB — ATP vs ADW",a:"Autonomous Database manages itself with zero human DBA intervention — it auto-tunes, auto-patches, auto-scales, and auto-heals. ATP is for daily transactions like a bank system. ADW is for analysis and reports like a BI dashboard.",e:"Traditional database = hiring and managing a full-time database expert. Autonomous DB = a self-driving car. You set the destination (data model), it handles all the driving (tuning, patching, scaling).",r:"ATP = transactions (buying, booking, ordering). ADW = analytics (reports, dashboards). Both self-manage. Always Free: 1 instance, 20GB. No DBA skills required at all."},
+{n:"DB Systems — VM, BM, Exadata",a:"Traditional Oracle Databases in the cloud where YOU stay in full control. You decide when to patch, how to configure, and how to set up HA. More control but more responsibility on your team.",e:"Autonomous = self-driving car. DB System = regular car you drive yourself. Full control over every setting. But you need to know how to drive safely (DBA skills required).",r:"DB System = you manage it. VM DB = smaller shared infrastructure. BM DB = dedicated physical server. Exadata = the Formula 1 car of Oracle databases."},
+{n:"MySQL HeatWave",a:"Regular MySQL database with a super-fast analytics engine built directly inside it. Run daily app transactions AND get instant business intelligence reports from the same system — no separate warehouse needed.",e:"Your e-commerce MySQL tracks orders all day (transactions). Boss asks for today's sales by city at 5pm. HeatWave answers in 2 seconds. Without HeatWave you wait 30 minutes or pay for a separate system.",r:"HeatWave = MySQL plus analytics in one box. 1000x faster analytics than plain MySQL. No ETL pipeline. Unique to OCI. Saves both time and infrastructure cost."},
+{n:"Data Guard — co-pilot database",a:"Data Guard keeps a perfectly synchronised copy (standby) of your Oracle database always ready. If the primary database has a problem, the standby takes over in minutes — like a trained co-pilot always ready to grab the controls.",e:"Primary pilot (main database) has a problem mid-flight. Co-pilot (standby database) takes over immediately. Passengers (your application) barely notice anything happened.",r:"Data Guard = Oracle-only co-pilot database. Switchover = planned maintenance. Failover = emergency. Near-zero data loss in synchronous mode. Essential for critical Oracle workloads."},
+{n:"RAC — multiple servers one database",a:"RAC lets multiple servers all run the same database simultaneously and share the workload. If one server crashes, the others keep the database running without any interruption or downtime.",e:"One database, 3 servers running it at once. Server 2 crashes at 2am — servers 1 and 3 continue without a single second of downtime. Like 3 cashiers at one register: one leaves, the queue keeps moving.",r:"RAC = multiple active servers sharing one database. Active-active HA plus scale-out. Combine RAC with Data Guard for maximum protection: active HA plus disaster recovery."},
+{n:"GoldenGate — live data copier",a:"GoldenGate watches your database for every single change and instantly copies it to another database — even a completely different database brand. Real-time, continuous, automatic replication.",e:"New customer added in your Oracle database in Mumbai — GoldenGate copies it to your PostgreSQL reporting database in Hyderabad within 1 second. Reporting team always has near-live data.",r:"GoldenGate = real-time any-to-any database replication. Data Guard = Oracle to Oracle only. GoldenGate crosses brands. Used for zero-downtime migrations and real-time data feeding."}
+]},
+{k:"d7",num:"D7",name:"Security & compliance",tagline:"Guards, locks, alarms, and inspectors",topics:[
+{n:"Security Zones vs Cloud Guard",a:"Security Zones = building regulations that prevent unsafe construction — you literally cannot build something that violates the rules. Cloud Guard = security cameras that watch and automatically alert or fix things after they go wrong.",e:"Security Zone: you try to make a storage bucket public — blocked completely at the moment of creation. Cloud Guard: bucket accidentally made public — detected and auto-fixed back to private.",r:"Security Zone = prevent bad things from being created. Cloud Guard = detect and remediate bad things after they happen. Use both together for defence in depth."},
+{n:"Vault — encryption key safe",a:"A bank-grade safe deposit box room for your encryption keys. Only authorised people and systems can use the keys. HSM means the keys are stored in physical tamper-proof hardware — they never leave the device.",e:"All your data is encrypted. The encryption key is the master key to all of it. Vault stores this master key in a box so secure that even Oracle employees cannot see or extract it.",r:"Vault = safe deposit box for encryption keys. HSM = most secure level, key never leaves hardware. BYOK = bring your own key from your own hardware security module."},
+{n:"Bastion Service — visitor pass desk",a:"Managed visitor desk that creates a temporary, monitored, time-limited access pass to reach a private server. No permanent door left open, no public IP needed. Every single visit is logged for audit.",e:"Priya needs to fix a problem on a private server with no public IP. Bastion creates a 1-hour access pass. She enters, fixes the issue, the pass expires automatically. Door closes. All recorded in audit logs.",r:"Bastion = temporary audited access without exposing private servers. Maximum session = 3 hours. All access logged. No permanent public door left open anywhere."},
+{n:"WAF — web attack bodyguard",a:"An intelligent bodyguard at your website door who checks not just visitor identity but what they are saying and trying to do — blocks hackers injecting malicious code, flooding with fake traffic, and exploiting web vulnerabilities.",e:"Hacker types SQL code into your login form trying to steal the database. WAF recognises this attack pattern instantly and blocks the request before it ever reaches your server. Normal users walk through fine.",r:"WAF = smart guard against web attacks. Protects against OWASP Top 10 threats like SQL injection and cross-site scripting. Essential for any public-facing website."},
+{n:"Vulnerability scanning — health check",a:"Automated health checks that probe your servers for known weak spots — old software versions, unpatched libraries, insecure settings — and give you a prioritised report of what to fix before hackers find the same gaps.",e:"Scanner checks your 50 servers and reports: 'Server 12 has unpatched OpenSSL with a known critical exploit. Server 34 has an insecure configuration.' Fix them before attackers find them first.",r:"VSS = proactive security health check. Finds weaknesses before attackers do. Runs regularly. Critical findings automatically raised in Cloud Guard for visibility."},
+{n:"OS Management Hub — patch manager",a:"Central IT patch management desk that pushes software updates to all your servers automatically — so your team does not need to log into 200 servers one by one to apply security updates.",e:"Oracle releases a critical security patch. Without OSMH: IT team spends 3 days patching 200 servers manually. With OSMH: patch pushed to all 200 overnight from one control panel.",r:"OS Management Hub = automated patch manager for your server fleet. Essential for security compliance. Proves to auditors that all servers are consistently patched."}
+]},
+{k:"d8",num:"D8",name:"Containers & cloud native",tagline:"Modular shops in a smart automated mall",topics:[
+{n:"OKE — Kubernetes made easy",a:"Kubernetes is a mall manager who assigns each shop (containerised app) to the best available stall, automatically restocks empty shelves, replaces closed shops, and opens new ones when demand spikes. OKE is Oracle's version — Oracle runs the mall manager for free.",e:"You have 50 microservices needing somewhere to run. OKE automatically decides which server runs which service, restarts crashed services within seconds, and scales busy ones up during peak traffic.",r:"OKE = managed Kubernetes. Control plane (management brain) = free from Oracle. You pay for worker servers only. Virtual Nodes = you don't even manage the worker servers."},
+{n:"Container Instances vs Functions",a:"Container Instance = run one containerised app directly without setting up a full Kubernetes cluster. Function = the absolute smallest possible action that runs for milliseconds when triggered by an event, then disappears.",e:"Nightly cleanup job: use Container Instance (run, complete job, shut down). Auto-resize every uploaded photo: use Function (runs 200 milliseconds per photo, shuts down, you pay per millisecond only).",r:"OKE = full orchestration for many services. Container Instance = simple one-off container. Function = micro-action triggered by events. Match the tool to the complexity of the task."},
+{n:"API Gateway — reception desk",a:"A smart reception desk sitting in front of all your backend services. External callers talk to reception, never directly to your engineers. Reception validates credentials, limits calls, and routes to the right department.",e:"Mobile app calls your API. Gateway checks the token is valid, ensures the app hasn't exceeded its rate limit, then routes to the correct microservice. Invalid tokens are stopped at reception — backend never touched.",r:"API Gateway = single front door for all your services. Handles authentication, rate limiting, and routing. Backend services stay hidden and protected behind it."},
+{n:"Streaming vs Queue",a:"Streaming = a conveyor belt where messages stay for days and multiple readers can all read the same messages independently. Queue = a task to-do list where one worker picks each task, completes it, and it gets deleted.",e:"Website click events on a Streaming belt — analytics team reads them AND personalisation team reads the same ones independently. Order placed in Queue — one payment processor picks it up, processes it, order deleted from queue.",r:"Streaming = persistent broadcast (many readers, messages survive). Queue = task list (one worker per task, then gone). Events and logs → Streaming. Background jobs and tasks → Queue."},
+{n:"Events Service — tripwire",a:"A tripwire system watching for things happening in OCI. When a trigger fires — file uploaded, server started, policy changed — it automatically starts other services or sends notifications without anyone pressing a button.",e:"File uploaded to Object Storage. Events Service sees it, fires a trigger, which automatically starts a Function that processes the file. No human involved. Fully automatic chain reaction.",r:"Events = OCI's tripwire. When X happens automatically do Y. Connects OCI services together without writing integration code."},
+{n:"Notifications ONS — broadcast speaker",a:"A broadcast loudspeaker. One message gets sent simultaneously to everyone who needs to know — email, Slack, phone, webhook — all at the same moment.",e:"CPU usage hits 90%. Alarm fires. ONS broadcasts simultaneously to: ops team email, Slack channel, PagerDuty alert, and a Function trying to auto-fix. All at the same instant.",r:"ONS = broadcast to many recipients. Used for alerting operations teams and triggering automated responses. Free for first million notifications per month."}
+]},
+{k:"d9",num:"D9",name:"Observability & management",tagline:"Dashboards, cameras, and health monitors",topics:[
+{n:"Monitoring — vital signs and alarms",a:"Continuously measures your infrastructure's vital signs — CPU temperature, memory fullness, network speed. Alarms are thresholds: if CPU goes above 90% for 5 minutes, automatically send an alert.",e:"Like a hospital heart monitor that never stops watching. If heart rate goes dangerous → alarm sounds → nurse runs in. If CPU goes dangerous → alert fires → on-call engineer investigates immediately.",r:"Monitoring = vital signs dashboard. Alarms = automatic alerts when vitals go out of range. Every production system must have alarms configured before going live."},
+{n:"Logging — event diaries",a:"Every server and OCI service keeps a detailed diary (log) of everything that happened — who connected, what commands ran, what failed and when. Logging stores all these diaries. Logging Analytics uses AI to read millions of diary entries and find hidden patterns.",e:"Server diary entry: '2:47am — user Ravi logged in from Chennai, made 3 configuration changes, logged out at 2:52am.' Something breaks at 3am — search the diary to find what happened just before.",r:"Logging = store event diaries. Logging Analytics = AI finds patterns in millions of diary entries. Audit log = always on, cannot be disabled or deleted by anyone."},
+{n:"APM — request journey tracker",a:"APM traces each customer request through your application like tracking a parcel through a courier network — exactly which sorting centres it passed through, how long each step took, and where it got delayed or stuck.",e:"Customer clicks Buy. APM traces the journey: Gateway 10ms → Auth 50ms → Inventory check 200ms (slow!) → Payment 80ms. You instantly know the inventory check is the bottleneck causing the slowness.",r:"APM = parcel tracker for your application's requests. Identifies exactly which service is slow. Essential for diagnosing performance problems in microservice architectures."},
+{n:"Service Connector Hub — no-code pipe",a:"A no-code data pipe builder that automatically moves data between OCI services. Instead of writing integration code to take logs and put them in storage, you click-connect two services and data flows automatically forever.",e:"Take all audit logs and automatically store them in Object Storage for 90-day compliance archival. Set up in the console with a few clicks, no code written. Data flows forever without human intervention.",r:"Service Connector Hub = no-code data pipeline between OCI services. Most common use: Logging to Object Storage for long-term compliance archival. Free service."},
+{n:"Audit Service — tamper-proof diary",a:"Records every single action anyone takes in your entire OCI environment — who clicked what, when, from where, and whether it succeeded. This record is tamper-proof and cannot be deleted or altered by anyone.",e:"An admin deleted a production database at 3am. Audit log shows: user ravi@company.com, action TerminateDBSystem, time 3:12am, IP address 103.x.x.x, result Success. Perfect for investigations and compliance.",r:"Audit = tamper-proof record of all OCI actions. Always on, cannot be disabled or deleted. Export to Object Storage via Service Connector for retention beyond the default 90 days."},
+{n:"Health Checks — outside-in pinging",a:"Automated pings sent from multiple cities around the world to your website — constantly checking if it's reachable, how fast it responds, and alerting your team immediately if it goes down.",e:"Every 30 seconds OCI pings your site from 5 different cities. Chennai users can reach it but Mumbai users cannot. Health Checks detect the discrepancy and alert you before Mumbai customers start complaining.",r:"Health Checks = automated availability monitoring from the outside, simulating real user access. Free basic tier. Different from APM which traces inside your application."}
+]},
+{k:"d10",num:"D10",name:"DevOps & automation",tagline:"The automated software assembly line",topics:[
+{n:"OCI DevOps — CI/CD pipeline",a:"Automates the entire journey from code written by a developer to software running live in production — compiling, testing, security scanning, and deploying automatically without any manual steps. A complete software assembly line.",e:"Developer pushes code at 3pm. Automatically: code compiled, 500 unit tests run, Docker image built, vulnerability scan passed, deployed to production servers. No human pressed deploy. Done by 3:15pm.",r:"CI = automatic build and test on every code commit. CD = automatic deployment to environments. Fewer manual steps = fewer human errors and much faster release cycles."},
+{n:"Resource Manager — infrastructure blueprint",a:"Describe your entire cloud infrastructure in a text document (code) and it gets built automatically. Want to create the exact same environment in another city? Use the same document. Want a test copy? Same document again.",e:"Document says: create VCN, 2 subnets, 3 web servers, 1 load balancer, 1 database. Apply the document → OCI builds everything in 10 minutes. Same document for dev, staging, and production environments.",r:"Resource Manager = infrastructure blueprint plus automatic builder. Your infrastructure becomes version-controlled like code. Rebuild identical environments anytime, anywhere."},
+{n:"Deployment strategies — canary and blue/green",a:"Canary = give 5% of real users the new version, watch carefully for problems, then gradually increase to 100%. Blue/Green = run old and new versions side by side, flip all traffic to new when ready, instant rollback if needed.",e:"New banking app version. Canary: 500 users get it first. No problems after 3 hours → expand to 10,000 → eventually everyone. If a problem appears: instantly rollback just those 500 users. Zero disruption to others.",r:"Canary = gradual rollout, reduces risk. Blue/Green = instant switch, zero downtime. Always build in rollback capability. Never release a new version to 100% of users simultaneously."},
+{n:"OCI CLI and SDKs",a:"CLI = type text commands to control OCI from your terminal. SDK = your application code (Python, Java, etc.) talks to OCI automatically. Both use the same underlying API — just different interfaces.",e:"CLI: one command to list all servers in a formatted table. SDK: Python script automatically shuts down all idle servers every night without anyone logging in. One is manual, one is automated.",r:"CLI = manual text commands for humans. SDK = automated code-driven control. Cloud Shell = browser-based terminal with CLI pre-installed and pre-authenticated. Zero setup needed."},
+{n:"Artifact Registry — built software library",a:"A private versioned library where you store all your compiled, built software packages — JARs, Helm charts, zip files — before deploying them anywhere. Like a warehouse of finished products ready for shipment.",e:"Developer builds the app → compiled JAR goes to Artifact Registry version 1.2. Deployment pipeline picks version 1.2 and deploys it. Registry also keeps versions 1.0 and 1.1 so rollback is one click.",r:"Artifact Registry = private package library. Stores JARs, Helm charts, generic files. OCIR stores Docker images. Both used together in modern DevOps pipelines."},
+{n:"Container scanning — pre-deployment X-ray",a:"Before any Docker container image gets deployed to production it is automatically X-rayed for known security vulnerabilities — old libraries, unpatched OS components, dangerous dependencies.",e:"You build a Docker image. Scanner reports: 3 critical vulnerabilities found in libcurl library (known exploit exists). You fix by updating the library and rebuild. The vulnerable image never reaches production.",r:"Scan images before every deployment. Finding vulnerabilities early = cheap and easy fix. Finding them in production = expensive emergency and potential breach. Integrate as automatic build pipeline gate."}
+]},
+{k:"d11",num:"D11",name:"AI & Data services",tagline:"Intelligent assistants and data scientists",topics:[
+{n:"OCI Generative AI Service",a:"Gives your applications access to powerful large language models that can write, summarise, answer questions, translate, and generate code — all running inside OCI so your sensitive data never leaves your region.",e:"HR chatbot answers employee policy questions. It reads your 500 company policy documents and answers correctly. No data sent to any external company. Everything processed and stored inside your OCI tenancy.",r:"OCI Gen AI = LLM capabilities running inside OCI. Data stays in your region. Supports Cohere and Meta LLaMA models. Use embeddings for semantic search."},
+{n:"AI Language — text understanding",a:"Reads any text and understands its meaning — is this customer review positive or negative? What are the key topics? Does this document contain personal information that should be hidden?",e:"10,000 support emails arrive daily. AI Language automatically classifies each as billing, technical, or compliment, rates the sentiment as angry happy or neutral, and routes each to the right team. All automated.",r:"AI Language = text understanding API. Pretrained models — no machine learning expertise needed. Sentiment analysis, entity extraction, PII detection. Just send text, get structured results back."},
+{n:"AI Vision — image reading",a:"Looks at images and understands what is in them — reads text from photos (OCR), identifies objects, detects defects in products, extracts structured data from documents like invoices and receipts.",e:"500 paper invoices arrive daily. AI Vision reads the vendor name, total amount, date, and line items from scanned photo automatically. No manual data entry. 500 invoices processed in a few minutes.",r:"AI Vision = image understanding API. OCR reads text from photos and scans. Document Understanding extracts structured fields from invoices and forms. No machine learning training needed."},
+{n:"AI Speech — voice to text",a:"Converts spoken audio to text (transcription) and text back to spoken audio (text-to-speech). Like a human transcriptionist or voice actor but instant, accurate, and completely automated.",e:"Call centre records 1,000 support calls daily. AI Speech transcribes all of them to text automatically overnight. QA team then searches all transcripts for calls where customers mentioned cancel to identify churn risk.",r:"ASR = audio to text (transcription). TTS = text to audio (speech synthesis). Multi-language support. Used for call centre transcription, accessibility features, and voice interfaces."},
+{n:"Data Flow — serverless big data",a:"Serverless big data processing. Submit your data processing job, a cluster of servers automatically appears and does the heavy lifting, then completely disappears when done. You pay only for the exact processing time used.",e:"Need to process 500 million log records to find fraud patterns. Write a Spark script, submit it to Data Flow. OCI creates a 20-server cluster, processes everything in 20 minutes, cluster disappears. You pay for 20 minutes.",r:"Data Flow = serverless Apache Spark. No cluster setup or management. Perfect for large-scale data transformation and analysis. Pay per processing hour only."},
+{n:"RAG — AI on your own documents",a:"RAG (Retrieval Augmented Generation) teaches an AI to answer questions using YOUR specific documents accurately. Convert documents to numerical fingerprints (embeddings), store them, find relevant ones when asked, pass to AI to answer correctly.",e:"Build a company policy chatbot. 500 policy PDFs converted to vector fingerprints stored in Oracle Database 23ai. User asks a question → system finds the most relevant policy sections → LLM answers accurately from those exact sections.",r:"RAG = embed your documents + search for relevant ones + LLM gives grounded accurate answers. OCI Gen AI provides embeddings. Oracle DB 23ai stores vectors. The most important enterprise AI pattern to understand."}
+]},
+{k:"d12",num:"D12",name:"Pricing, governance & cost",tagline:"Bills, budgets, and spending guards",topics:[
+{n:"PAYG vs Monthly Flex vs Annual",a:"PAYG = electricity meter, pay for exactly what you use. Monthly Flex = monthly mobile plan with minimum commitment and discount. Annual = yearly gym membership paid upfront for the biggest discount.",e:"PAYG: run test server for 3 hours, pay for 3 hours, delete, done. Monthly Flex: commit to minimum monthly spend for 33% discount. Annual: commit for full year for up to 57% discount.",r:"PAYG = no commitment, highest rate. Monthly Flex = monthly commitment, moderate discount. Annual = full year commitment, maximum discount. Choose based on how predictable your usage is."},
+{n:"OCI Always Free Tier",a:"Permanently free resources that never expire as long as your account is active. Not a 30-day trial. Oracle gives you a real, functional (small-scale) cloud environment at absolutely no charge forever.",e:"Always Free includes: 2 small VMs, Ampere ARM server with 4 CPUs and 24GB RAM (most generous free compute in any major cloud), 10GB Object Storage, 1 Autonomous Database, 1 Load Balancer.",r:"Always Free ≠ temporary trial. Permanent. A1.Flex 4 OCPU and 24GB RAM is the most generous always-free compute offer in the entire cloud industry."},
+{n:"Cost Analysis and Budgets",a:"Cost Analysis shows exactly where every rupee was spent — which service, which team compartment, which project, broken down any way you need. Budgets send you an alert when spending is approaching the limit.",e:"Month end: Cost Analysis shows Database 40%, Compute 35%, Storage 15%. Engineering team spent 3x the Finance team. Budget alert fires at 80% of monthly limit, giving you time to act before overspending.",r:"Cost Analysis = spending breakdown. Budgets = spending alarm bell. Budgets warn you but do not stop spending. Use Quotas in addition to hard-stop resource creation in specific compartments."},
+{n:"Tagging strategy",a:"Tags are sticky coloured labels you attach to every cloud resource — Environment=Production, Team=Engineering, Project=RetailApp. Labels make cost filtering, policy enforcement, and resource discovery possible at scale.",e:"Every single resource tagged with its Project name. Month end: filter all costs by Project=RetailApp — instantly see total cloud spend for that project across every service. No tags = no visibility into anything.",r:"Tags = labels on resources. Defined tags = enforced schema, use only approved values, can be referenced in IAM policies. Free-form tags = anything goes but cannot control access with them."},
+{n:"Quotas and service limits",a:"Service limits are Oracle's maximum caps — maximum 50 VMs allowed in a given region by default. Quotas are your own lower limits you set for specific teams — the dev team cannot accidentally spin up 200 servers.",e:"Engineering Dev compartment quota set to maximum 10 VMs. Engineer tries to create the 11th VM — OCI blocks it automatically. Budget protected without anyone manually watching or intervening.",r:"Service limits = Oracle's ceiling you can request to raise. Quotas = your ceiling for sub-teams to prevent overspending. Budgets warn. Quotas stop. Both are needed."},
+{n:"Support tiers",a:"Five levels of Oracle support: Basic (free, community forums only), Developer (email support for SRs), Standard (business hours phone), Premier (24 hours 7 days, fast response), Mission Critical (dedicated expert, 15-minute response).",e:"Personal learning project = Basic (forums only is fine). Small startup production app = Standard. Bank, hospital, or airline on OCI = Premier or Mission Critical. Down at 2am with revenue losing? You want Premier minimum.",r:"Pay for the support tier that matches your business risk. If one hour of downtime costs more than the annual support upgrade — upgrade. Mission Critical includes a dedicated Technical Account Manager."}
+]}
+];
+
+let xD={}, xT={};
+
+function init() {
+  build(DATA);
+}
+
+function build(list) {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  if (!list.length) { main.innerHTML = '<div class="no-result">No topics found — try different search words</div>'; return; }
+  list.forEach(d => {
+    const dOpen = xD[d.k];
+    const div = document.createElement('div');
+    div.className = `domain-block ${d.k}`;
+    div.id = d.k;
+    div.innerHTML = `
+      <div class="domain-hdr" onclick="togD('${d.k}')">
+        <span class="d-num">${d.num}</span>
+        <span class="d-title">${d.name}</span>
+        <span class="d-tagline">${d.tagline}</span>
+        <span class="d-arrow ${dOpen?'open':''}">&#8964;</span>
+      </div>
+      <div class="domain-body ${dOpen?'open':''}">
+        ${d.topics.map((t,i) => {
+          const tk = d.k+'t'+i;
+          const tOpen = xT[tk];
+          return `<div class="topic-block" id="${tk}">
+            <div class="topic-hdr" onclick="togT('${tk}')">
+              <span class="t-title">${t.n}</span>
+              <span class="t-arrow ${tOpen?'open':''}">&#8964;</span>
+            </div>
+            <div class="topic-body ${tOpen?'open':''}">
+              <div class="strip-analogy">
+                <div class="strip-label">&#128161; Real-world analogy</div>
+                <div class="strip-text">${t.a}</div>
+              </div>
+              <div class="strip-example">
+                <div class="strip-label">&#8594; Example</div>
+                <div class="strip-text">${t.e}</div>
+              </div>
+              <div class="strip-remember">
+                <div class="strip-label">&#10003; Remember this</div>
+                <div class="strip-text">${t.r}</div>
+              </div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    main.appendChild(div);
+  });
+}
+
+function togD(k) {
+  xD[k] = !xD[k];
+  const b = document.querySelector(`#${k} .domain-body`);
+  const a = document.querySelector(`#${k} .d-arrow`);
+  if (b) { b.classList.toggle('open', xD[k]); a.classList.toggle('open', xD[k]); }
+}
+
+function togT(k) {
+  xT[k] = !xT[k];
+  const b = document.querySelector(`#${k} .topic-body`);
+  const a = document.querySelector(`#${k} .t-arrow`);
+  if (b) { b.classList.toggle('open', xT[k]); a.classList.toggle('open', xT[k]); }
+}
+
+function xa(v) {
+  DATA.forEach((d,i) => {
+    xD[d.k] = v;
+    d.topics.forEach((_,j) => { xT[d.k+'t'+j] = v; });
+  });
+  go();
+}
+
+function go() {
+  const q = document.getElementById('srch').value.toLowerCase();
+  const df = document.getElementById('df').value;
+  let list = DATA;
+  if (df) list = list.filter(d => d.k === df);
+  if (q.length > 1) {
+    list = list.map(d => {
+      const topics = d.topics.filter(t =>
+        t.n.toLowerCase().includes(q) || t.a.toLowerCase().includes(q) ||
+        t.e.toLowerCase().includes(q) || t.r.toLowerCase().includes(q)
+      );
+      if (!topics.length) return null;
+      xD[d.k] = true;
+      topics.forEach((t, j) => {
+        const i = d.topics.indexOf(t);
+        xT[d.k+'t'+i] = true;
+      });
+      return {...d, topics};
+    }).filter(Boolean);
+  }
+  build(list);
+}
+
+init();
+</script>
+</body>
+</html>
